@@ -25,7 +25,7 @@
   position: relative;
   width: 20%;
   margin: 0 auto;
-  height: 900px;
+  height: 850px;
   max-height: 100vh;
   margin-top: calc(100vh - 95vh - 20px);
   background: #fff;
@@ -36,13 +36,27 @@
   display: flex;
   flex-direction: column;
 }
-
+.box-modal-kecil {
+  position: relative;
+  width: 90%;
+  margin: 0 auto;
+  height: 400px;
+  max-height: 100vh;
+  margin-top: calc(100vh - 95vh - 20px);
+  background: #fff;
+  border-radius: 4px;
+  padding: 20px;
+  border: 1px solid #999;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
 .cardPost {
   display: flex;
   background-color: #fff;
   flex-direction: column;
   justify-content: space-between;
-  margin-top: 50px;
+  margin-top: 5px;
   padding: 10px 20px;
 }
 
@@ -64,4 +78,17 @@
 .cardPost .email {
   font-size: 14px;
   font-size: 400;
+}
+.btn-modal {
+  background-color: white;
+  /* border-radius: 6px; */
+  outline: 0;
+  border-width: 0 0 0px;
+  border-color: black;
+  width: 90px;
+  height: 40px;
+}
+.div-btn-modal {
+  float: right;
+  border-radius: 4px;
 }

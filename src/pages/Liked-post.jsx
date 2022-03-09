@@ -11,12 +11,11 @@ import HeartIcon from "@heroicons/react/solid/HeartIcon";
 import HeartIconOutline from "@heroicons/react/outline/HeartIcon";
 
 import PageDetail from "./pageDetailPost";
-import ModalTambah from "../component/modal-input";
 
 import "../styles/navbar.css";
 import "../styles/post.css";
 
-const Home = ({ title, logic }) => {
+const LikedPost = ({ title, logic }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [id, setId] = useState("");
   const [mail, setMail] = useState("");
@@ -30,9 +29,6 @@ const Home = ({ title, logic }) => {
     setSelectedItem(post);
   };
 
-  const openModalTambah = () => {
-    setOpen(true);
-  };
   const closeModal = () => {
     setOpen(false);
   };
@@ -65,15 +61,6 @@ const Home = ({ title, logic }) => {
     setPost(getData.data);
   };
   let lastname = JSON.parse(localStorage.getItem("testiing"));
-
-  useEffect(() => {
-    getPost();
-  }, []);
-
-  useEffect(() => {
-    getPost();
-  }, [lastname]);
-
   var items = [];
 
   const test = (post) => {
@@ -184,70 +171,43 @@ const Home = ({ title, logic }) => {
       {/* Conten post */}
       <div className="home">
         {/* {console.log(lastname)} */}
-        {post.map((posts, index) => (
-          <>
-            <div key={posts.id} className="cardHome">
-              {/* {console.log(lastname.some((a) => a.id === posts.id))} */}
-              <div
-                className="left"
-                onClick={() => {
-                  openModal(posts);
-                }}
-              >
-                <p className="title">{posts.title}</p>
-                <p className="body">{posts.body}</p>
-              </div>
-
-              <div className="right">
-                <button onClick={() => test(posts)}>
-                  {lastname === null ? (
-                    <HeartIconOutline className="icon" />
-                  ) : lastname.some((a) => a.id === posts.id) ? (
-                    <HeartIcon className="icon" />
-                  ) : (
-                    <HeartIconOutline className="icon" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </>
-        ))}
-      </div>
-
-      <div class="fab-container">
-        <div
-          class="fab fab-icon-holder"
-          onClick={() => {
-            openModalTambah();
-          }}
-        >
-          <i class="fas fa-question">+</i>
-        </div>
-        {/* <ul class="fab-options">
-          <li>
-            <span class="fab-label">Tambah</span>
+        {lastname.map((posts, index) => (
+          <div key={posts.id} className="cardHome">
+            {/* {console.log(lastname.some((a) => a.id === posts.id))} */}
             <div
-              class="fab-icon-holder"
+              className="left"
               onClick={() => {
-                openModal();
+                openModal(posts);
               }}
             >
-              <i class="fas fa-file-alt"></i>
+              <p className="title">{posts.title}</p>
+              <p className="body">{posts.body}</p>
             </div>
-          </li>
-        </ul> */}
+
+            <div className="right">
+              <button onClick={() => test(posts)}>
+                {lastname === null ? (
+                  <HeartIconOutline className="icon" />
+                ) : lastname.some((a) => a.id === posts.id) ? (
+                  <HeartIcon className="icon" />
+                ) : (
+                  <HeartIconOutline className="icon" />
+                )}
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
       {selectedItem === null ? (
         ""
       ) : (
         <PageDetail open={open} onClose={closeModal} value={selectedItem} />
       )}
-      <ModalTambah open={open} onClose={closeModal} />
     </>
   );
 };
 
-export default Home;
+export default LikedPost;
 
 const Popup = (props) => {
   return (
