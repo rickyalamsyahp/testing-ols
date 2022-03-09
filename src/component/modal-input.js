@@ -9,12 +9,18 @@ import React, { useState, useEffect } from "react";
 import "../styles/modal-input.css";
 
 function ModalInput({ open, onClose, value = null }) {
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
+  const [title, setTitle] = useState(value ? value.title : "");
+  const [body, setBody] = useState(value ? value.body : "");
 
   const handleClose = () => {
     onClose();
   };
+
+  useEffect(() => {
+    setTitle(value ? value.title : "");
+    setBody(value ? value.body : "");
+  }, [value]);
+
   return (
     <div className="dialog">
       <Dialog onClose={handleClose} open={open}>

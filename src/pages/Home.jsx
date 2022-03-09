@@ -9,32 +9,71 @@ import {
 } from "../store/loginSlice";
 import HeartIcon from "@heroicons/react/solid/HeartIcon";
 import HeartIconOutline from "@heroicons/react/outline/HeartIcon";
-
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { confirmAlert } from "react-confirm-alert"; // Import
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import PageDetail from "./pageDetailPost";
 import ModalTambah from "../component/modal-input";
 
 import "../styles/navbar.css";
 import "../styles/post.css";
 
+const options = ["Edit", "Hapus"];
+const ITEM_HEIGHT = 48;
+
 const Home = ({ title, logic }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [id, setId] = useState("");
   const [mail, setMail] = useState("");
   const [post, setPost] = useState([]);
   const [postDetail, setPostDetail] = useState("");
   const [open, setOpen] = useState(false);
+  const [openView, setOpenView] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItemEdit, setSelectedItemEdit] = useState(null);
 
   const openModal = (post) => {
     setOpen(true);
     setSelectedItem(post);
   };
 
+  const buka = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleAdd = (posts, option) => {
+    if (option === "Edit") {
+      setSelectedItemEdit(posts);
+      setOpenView(true);
+      setAnchorEl(null);
+    } else {
+      submit(posts);
+      setAnchorEl(null);
+    }
+  };
+  // const handleDelete = (option) => {
+  //   setSelectedItemEdit(option);
+  //   console.log(option);
+  //   setOpenView(true);
+  //   setAnchorEl(null);
+  // };
+  const handleTutup = () => {
+    setAnchorEl(null);
+  };
+
   const openModalTambah = () => {
-    setOpen(true);
+    setOpenView(true);
   };
   const closeModal = () => {
     setOpen(false);
+  };
+  const closeModalView = () => {
+    setOpenView(false);
   };
 
   const dispatch = useDispatch();
@@ -101,6 +140,23 @@ const Home = ({ title, logic }) => {
         localStorage.setItem("testiing", JSON.stringify(items));
       }
     }
+  };
+
+  const submit = (posts) => {
+    confirmAlert({
+      title: "Confirm to submit",
+      message: "Yakin hapus post ini ?",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => alert(`post dengan id ${posts.id} terhapus`),
+        },
+        {
+          label: "No",
+          onClick: () => alert("Click No"),
+        },
+      ],
+    });
   };
 
   return (
@@ -209,19 +265,58 @@ const Home = ({ title, logic }) => {
                   )}
                 </button>
               </div>
+              <div key={posts.id}>
+                <IconButton
+                  aria-label="more"
+                  id="long-button"
+                  aria-controls={buka ? "long-menu" : undefined}
+                  aria-expanded={buka ? "true" : undefined}
+                  aria-haspopup="true"
+                  onClick={handleClick}
+                >
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  id="long-menu"
+                  MenuListProps={{
+                    "aria-labelledby": "long-button",
+                  }}
+                  anchorEl={anchorEl}
+                  open={buka}
+                  onClose={handleTutup}
+                  PaperProps={{
+                    style: {
+                      maxHeight: ITEM_HEIGHT * 4.5,
+                      width: "20ch",
+                    },
+                  }}
+                >
+                  {options.map((option) => (
+                    <MenuItem
+                      key={option}
+                      selected={option === "Edit"}
+                      onClick={() => {
+                        handleAdd(posts, option);
+                      }}
+                    >
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </div>
             </div>
           </>
         ))}
       </div>
 
-      <div class="fab-container">
+      <div className="fab-container">
         <div
-          class="fab fab-icon-holder"
+          className="fab fab-icon-holder"
           onClick={() => {
             openModalTambah();
           }}
         >
-          <i class="fas fa-question">+</i>
+          <i className="fas fa-question">+</i>
         </div>
         {/* <ul class="fab-options">
           <li>
@@ -242,7 +337,11 @@ const Home = ({ title, logic }) => {
       ) : (
         <PageDetail open={open} onClose={closeModal} value={selectedItem} />
       )}
-      <ModalTambah open={open} onClose={closeModal} />
+      <ModalTambah
+        open={openView}
+        onClose={closeModalView}
+        value={selectedItemEdit}
+      />
     </>
   );
 };
