@@ -1,3 +1,5 @@
+/* eslint-disable no-lone-blocks */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,11 +32,11 @@ const Home = ({ title, logic }) => {
   const [id, setId] = useState("");
   const [mail, setMail] = useState("");
   const [post, setPost] = useState([]);
-  const [postDetail, setPostDetail] = useState("");
   const [open, setOpen] = useState(false);
   const [openView, setOpenView] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedItemEdit, setSelectedItemEdit] = useState(null);
+  const [page, setPage] = useState(1);
 
   const openModal = (post) => {
     setOpen(true);
@@ -98,16 +100,29 @@ const Home = ({ title, logic }) => {
   };
 
   const getPost = async () => {
-    const getData = await axios.get(
-      "https://jsonplaceholder.typicode.com/posts"
+    const data = await axios.get(
+      `https://jsonplaceholder.typicode.com/posts?_limit=10&_page=${page}&_start=0`
     );
-    setPost(getData.data);
+    setPost([...post, ...data.data]);
   };
   let lastname = JSON.parse(localStorage.getItem("testiing"));
 
+  const scrollEnd = () => {
+    setPage(page + 1);
+  };
+
+  window.onscroll = function () {
+    if (
+      window.innerHeight + document.documentElement.scrollTop ===
+      document.documentElement.offsetHeight
+    ) {
+      scrollEnd();
+    }
+  };
+
   useEffect(() => {
     getPost();
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     getPost();

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable no-lone-blocks */
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
 import {
   deleteAllLogin,
   saveLogin,
@@ -19,8 +19,6 @@ const LikedPost = ({ title, logic }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [id, setId] = useState("");
   const [mail, setMail] = useState("");
-  const [post, setPost] = useState([]);
-  const [postDetail, setPostDetail] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -54,12 +52,6 @@ const LikedPost = ({ title, logic }) => {
     }
   };
 
-  const getPost = async () => {
-    const getData = await axios.get(
-      "https://jsonplaceholder.typicode.com/posts"
-    );
-    setPost(getData.data);
-  };
   let lastname = JSON.parse(localStorage.getItem("testiing"));
   var items = [];
 

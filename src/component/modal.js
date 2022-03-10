@@ -1,4 +1,3 @@
-import DialogTitle from "@mui/material/DialogTitle";
 import Tab from "@material-ui/core/Tab";
 import Tabs from "@material-ui/core/Tabs";
 import Dialog from "@mui/material/Dialog";
@@ -32,6 +31,7 @@ function SimpleDialog({ open, onClose, value = null }) {
 
   useEffect(() => {
     getCommand();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return loading ? (

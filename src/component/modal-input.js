@@ -1,9 +1,5 @@
 import DialogTitle from "@mui/material/DialogTitle";
-import Tab from "@material-ui/core/Tab";
-import Tabs from "@material-ui/core/Tabs";
 import Dialog from "@mui/material/Dialog";
-import axios from "axios";
-import Box from "@material-ui/core/Box";
 import React, { useState, useEffect } from "react";
 
 import "../styles/modal-input.css";
