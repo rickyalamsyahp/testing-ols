@@ -27,6 +27,8 @@
 
 .navbar .nav .right {
   margin-right: 10vw;
+  display: flex;
+  
 }
 
 .navbar .nav .right .logic {
@@ -39,6 +41,7 @@
   border-radius: 5px;
   font-size: 18px;
   font-weight: 500;
+  margin-left: 10px;
 }
 
 .navbar .nav .right .logic .text {
