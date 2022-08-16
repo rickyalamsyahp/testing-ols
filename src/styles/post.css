@@ -3,10 +3,20 @@
 }
 
 .cardHome {
+  cursor: pointer;
   display: flex;
   background-color: #fff;
   justify-content: space-around;
   align-items: center;
+  animation: fade 1s;
+}
+@keyframes fade{
+  0%{
+    opacity: 0;
+  }
+  100%{
+    opacity: 1;
+  }
 }
 
 .cardHome:nth-child(even) {

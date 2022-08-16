@@ -1,9 +1,9 @@
 /* eslint-disable no-lone-blocks */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { saveLogin } from "../redux/reducers/loginSlice";
+import { deleteAllLogin, selectLoginList } from "../redux/reducers/loginSlice";
 
 import HeartIcon from "@heroicons/react/solid/HeartIcon";
 import HeartIconOutline from "@heroicons/react/outline/HeartIcon";
@@ -13,23 +13,21 @@ import MenuItem from "@mui/material/MenuItem";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
-import ModalTambah from "../component/modal-input";
 
 import "../styles/navbar.css";
 import "../styles/post.css";
-import { getPostTesting } from "../redux/actions/PostActions";
+import { getPostTestingByLogin } from "../redux/actions/PostActions";
+import axios from "axios";
 
 const options = ["Edit", "Hapus"];
 const ITEM_HEIGHT = 48;
 
-const Home = ({ title, logic }) => {
+const HomeAdmin = ({ title, logic }) => {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [id, setId] = useState("");
-  const [mail, setMail] = useState("");
-  const [openView, setOpenView] = useState(false);
-  const [selectedItemEdit, setSelectedItemEdit] = useState(null);
   const [page, setPage] = useState(1);
+  const navigate = useNavigate();
 
   const buka = Boolean(anchorEl);
 
@@ -38,8 +36,14 @@ const Home = ({ title, logic }) => {
   };
   const handleAdd = (posts, option) => {
     if (option === "Edit") {
-      setSelectedItemEdit(posts);
-      setOpenView(true);
+      navigate(`/admin/post/${posts.id}/edit`, {
+        state: {
+          value: posts,
+          open: true,
+          userId: location.state.id,
+        },
+      });
+      // setOpenView(true);
       setAnchorEl(null);
     } else {
       submit(posts);
@@ -50,23 +54,16 @@ const Home = ({ title, logic }) => {
     setAnchorEl(null);
   };
 
-  const closeModalView = () => {
-    setOpenView(false);
-  };
-
   const dispatch = useDispatch();
+
+  const userId = useSelector(selectLoginList);
   const posst = useSelector((state) => state.preSales);
   const togglePopup = () => {
     setIsOpen(!isOpen);
   };
 
   const doLogic = () => {
-    dispatch(
-      saveLogin({
-        id: id,
-        mail: mail,
-      })
-    );
+    dispatch(deleteAllLogin);
   };
 
   let lastname = JSON.parse(localStorage.getItem("testiing"));
@@ -85,10 +82,7 @@ const Home = ({ title, logic }) => {
   };
 
   useEffect(() => {
-    if (logic === "Login") {
-      dispatch(getPostTesting(page));
-    } else {
-    }
+    dispatch(getPostTestingByLogin({ page: page, userId: location.state.id }));
   }, [page]);
 
   // useEffect(() => {
@@ -107,7 +101,9 @@ const Home = ({ title, logic }) => {
         1
       );
       localStorage.setItem("testiing", JSON.stringify(lastname));
-      dispatch(getPostTesting(page));
+      dispatch(
+        getPostTestingByLogin({ page: page, userId: location.state.id })
+      );
     } else {
       if (lastname) {
         items.push(post, ...lastname);
@@ -118,7 +114,9 @@ const Home = ({ title, logic }) => {
           }
         });
         localStorage.setItem("testiing", JSON.stringify(unique));
-        dispatch(getPostTesting(page));
+        dispatch(
+          getPostTestingByLogin({ page: page, userId: location.state.id })
+        );
       } else {
         items.push(post);
         localStorage.setItem("testiing", JSON.stringify(items));
@@ -133,7 +131,14 @@ const Home = ({ title, logic }) => {
       buttons: [
         {
           label: "Yes",
-          onClick: () => alert(`post dengan id ${posts.id} terhapus`),
+          onClick: async () => {
+            const res = await axios.delete(
+              `https://jsonplaceholder.typicode.com/posts/${posts.id}`
+            );
+            if (res.status === 200) {
+              alert("Data Berhasil Terhapus");
+            }
+          },
         },
         {
           label: "No",
@@ -148,7 +153,7 @@ const Home = ({ title, logic }) => {
       <div className="navbar">
         <div className="nav">
           <div className="left">
-            <Link to="/" className="title">
+            <Link to={`/admin/${userId[0].id}`} className="title">
               <p className="title">{title}</p>
             </Link>
           </div>
@@ -163,29 +168,6 @@ const Home = ({ title, logic }) => {
             content={
               <div>
                 <b>{logic}</b>
-                <div className="textfield">
-                  <div className="userId">
-                    <p>User Id</p>
-                    <input
-                      className="input"
-                      type="text"
-                      value={id}
-                      onChange={(e) => setId(e.target.value)}
-                      placeholder="user id"
-                    />
-                  </div>
-                  <div className="email">
-                    <p>Email</p>
-                    <input
-                      className="input"
-                      type="text"
-                      value={mail}
-                      onChange={(e) => setMail(e.target.value)}
-                      placeholder="email"
-                    />
-                  </div>
-                </div>
-
                 <div className="button">
                   <div className="button-cancel">
                     <button onClick={togglePopup} className="button_cancel">
@@ -193,13 +175,7 @@ const Home = ({ title, logic }) => {
                     </button>
                   </div>
                   <div className="button-login">
-                    <Link
-                      to={`/admin`}
-                      state={{
-                        id: id,
-                      }}
-                      onClick={doLogic}
-                    >
+                    <Link to={"/"} onClick={doLogic}>
                       <button onClick={doLogic} className="button_login">
                         {logic}
                       </button>
@@ -215,11 +191,12 @@ const Home = ({ title, logic }) => {
       </div>
       {/* Conten post */}
       <div className="home">
-        {posst.post.map((posts, index) => (
+        {posst.postId.map((posts, index) => (
           <div key={index} className="cardHome">
+            {/* {console.log(lastname.some((a) => a.id === posts.id))} */}
             <Link
               className="left"
-              to={`/post/${posts.id}`}
+              to={`/admin/post/${posts.id}`}
               state={{
                 value: posts,
                 open: true,
@@ -240,62 +217,69 @@ const Home = ({ title, logic }) => {
                 )}
               </button>
             </div>
-            {logic === "Logout" && (
-              <div key={posts.id}>
-                <IconButton
-                  aria-label="more"
-                  id="long-button"
-                  aria-controls={buka ? "long-menu" : undefined}
-                  aria-expanded={buka ? "true" : undefined}
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-                <Menu
-                  id="long-menu"
-                  MenuListProps={{
-                    "aria-labelledby": "long-button",
-                  }}
-                  anchorEl={anchorEl}
-                  open={buka}
-                  onClose={handleTutup}
-                  PaperProps={{
-                    style: {
-                      maxHeight: ITEM_HEIGHT * 4.5,
-                      width: "20ch",
-                    },
-                  }}
-                >
-                  {options.map((option) => (
-                    <MenuItem
-                      key={option}
-                      selected={option === "Edit"}
-                      onClick={() => {
-                        handleAdd(posts, option);
-                      }}
-                    >
-                      {option}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </div>
-            )}
+            <div key={index}>
+              <IconButton
+                aria-label="more"
+                id="long-button"
+                aria-controls={buka ? "long-menu" : undefined}
+                aria-expanded={buka ? "true" : undefined}
+                aria-haspopup="true"
+                onClick={handleClick}
+              >
+                <MoreVertIcon />
+              </IconButton>
+              <Menu
+                id="long-menu"
+                MenuListProps={{
+                  "aria-labelledby": "long-button",
+                }}
+                anchorEl={anchorEl}
+                open={buka}
+                onClose={handleTutup}
+                PaperProps={{
+                  style: {
+                    maxHeight: ITEM_HEIGHT * 4.5,
+                    width: "20ch",
+                    boxShadow: "none",
+                  },
+                }}
+              >
+                {options.map((option) => (
+                  <MenuItem
+                    key={option}
+                    selected={option === "Edit"}
+                    onClick={() => {
+                      handleAdd(posts, option);
+                    }}
+                  >
+                    {option}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </div>
           </div>
         ))}
       </div>
 
+      <div className="fab-container">
+        <Link
+          className="tambah"
+          to={`/admin/create`}
+          state={{
+            value: null,
+            open: true,
+            userId: location.state.id,
+          }}
+        >
+          <i className="fas fa-question">+</i>
+        </Link>
+      </div>
       <Outlet />
-      <ModalTambah
-        open={openView}
-        onClose={closeModalView}
-        value={selectedItemEdit}
-      />
     </>
   );
 };
 
-export default Home;
+export default HomeAdmin;
 
 const Popup = (props) => {
   return (
